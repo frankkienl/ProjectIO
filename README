@@ -1,0 +1,22 @@
+Project IO
+
+Project IO is an open source clone of the game "Etrian Odyssey" designed and
+published by Atlus.
+
+The project was started as a way for me to both practice up my development
+skills and, when it is completed, pass the time between releases of the game.
+
+If all goes well, the project will have full customization in regards to art,
+the maze, classes, skills, items, and whatever else I can think of.
+
+Code Notes
+
+The code is a disaster.  There's a lot of things that need to be done, besides
+basic cleanup.  I need to move numerous sections to either separate namespaces.
+I need to put in checks for OpenGL features.  I even need to consider reducing
+the required OpenGL version, as 3.2 is a little high for the needs of the
+project.  I also need to re-organize the whole data folder, separate the
+various resources into their own subfolders, and then move the data folder
+to it's own subfolder to indicate the "base" testing game.
+
+In short, there's a lot to do.
