@@ -32,18 +32,15 @@ namespace io {
     GuildHallController(ScreenManager* screenManager, Guild* guild,
                         Party* party) {
       if (!screenManager) {
-        std::cout << "Hello." << std::endl;
         //FIXME:  Change this to something more useful.
         throw std::exception();
       }
 
       if (!guild) {
-        std::cout << "Hello." << std::endl;
         throw std::exception();
       }
 
       if (!party) {
-        std::cout << "Hello." << std::endl;
         throw std::exception();
       }
 
@@ -71,8 +68,10 @@ namespace io {
     }
 
     virtual bool handleInputEvent(const InputEvent& event) {
-      if (event.getType() == InputEventType::CANCEL) {
-        screenManager->popScreen();
+      if (event.getState() == InputEventState::DOWN) {
+        if (event.getType() == InputEventType::CANCEL) {
+          screenManager->popScreen();
+        }
       }
 
       return false;
