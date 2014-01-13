@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<class>
+    <name>Knight</name>
+    <shortName>K</shortName>
+    <level>
+        <hp>100</hp>
+        <tp>10</tp>
+        <str>10</str>
+        <vit>10</vit>
+        <tec>10</tec>
+        <agi>10</agi>
+        <luk>10</luk>
+    </level>
+</class>
