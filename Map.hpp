@@ -28,6 +28,79 @@ namespace io {
   };
 
   /**
+   * A MapCell represents a single cell in a map.  The resource IDs represent
+   * how the cell looks from the outside, not from the inside.  Thus, when the
+   * player is standing to the north, looking south, they will be seeing the
+   * north facing resource of the cell.
+   */
+  class MapCell {
+  public:
+    uint8_t getCellCeiling() const {
+      return cellCeiling;
+    }
+
+    uint8_t getCellFloor() const {
+      return cellFloor;
+    }
+
+    uint8_t getEastWall() const {
+      return eastWall;
+    }
+
+    uint8_t getNorthWall() const {
+      return northWall;
+    }
+
+    uint8_t getSouthWall() const {
+      return southWall;
+    }
+
+    uint8_t getWestWall() const {
+      return westWall;
+    }
+
+    bool isSolid() const {
+      return solid;
+    }
+
+    void setCellCeiling(const uint8_t cellCeiling) const {
+      this->cellCeiling = cellCeiling;
+    }
+
+    void setCellFloor(const uint8_t cellFloor) const {
+      this->cellFloor = cellFloor;
+    }
+
+    void setEastWall(const uint8_t eastWall) const {
+      this->eastWall = eastWall;
+    }
+
+    void setNorthWall(const uint8_t northWall) const {
+      this->northWall = northWall;
+    }
+
+    void setSouthWall(const uint8_t southWall) const {
+      this->southWall = southWall;
+    }
+
+    void setWestWall(const uint8_t westWall) const {
+      this->westWall = westWall;
+    }
+
+    void setSolid(bool solid) {
+      this->solid = solid;
+    }
+  private:
+    uint8_t cellCeiling;
+    uint8_t cellFloor;
+    uint8_t eastWall;
+    uint8_t northWall;
+    uint8_t southWall;
+    uint8_t westWall;
+    bool solid;
+  };
+
+  /**
    * Represents a map.  Currently hard-coded to 35 * 30 units in size.
    */
   class Map {
