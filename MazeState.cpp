@@ -99,8 +99,8 @@ namespace io {
   }
 
   void MazeState::onActivate() {
-    playerX = 6;
-    playerY = 19;
+    playerX = 7;
+    playerY = 20;
     playerFacing = Facing::NORTH;
 
     cameraX = 0.0f;
@@ -131,7 +131,7 @@ namespace io {
         break;
     }
 
-    if (currentMap->getTile(newX, newY) != TILE::SOLID) {
+    if (!currentMap->isCellSolid(newX, newY)) {
       playerX = newX;
       playerY = newY;
     }
@@ -164,7 +164,7 @@ namespace io {
         break;
     }
 
-    if (currentMap->getTile(newX, newY) != TILE::SOLID) {
+    if (!currentMap->isCellSolid(newX, newY)) {
       playerX = newX;
       playerY = newY;
     }

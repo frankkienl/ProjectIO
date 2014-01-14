@@ -21,12 +21,6 @@
 #include <cstdint>
 
 namespace io {
-  enum class TILE : uint8_t {
-    SOLID = 0,
-    OPEN = 1,
-    TILE_MAX = 2
-  };
-
   /**
    * A MapCell represents a single cell in a map.  The resource IDs represent
    * how the cell looks from the outside, not from the inside.  Thus, when the
@@ -63,27 +57,27 @@ namespace io {
       return solid;
     }
 
-    void setCellCeiling(const uint8_t cellCeiling) const {
+    void setCellCeiling(const uint8_t cellCeiling) {
       this->cellCeiling = cellCeiling;
     }
 
-    void setCellFloor(const uint8_t cellFloor) const {
+    void setCellFloor(const uint8_t cellFloor) {
       this->cellFloor = cellFloor;
     }
 
-    void setEastWall(const uint8_t eastWall) const {
+    void setEastWall(const uint8_t eastWall) {
       this->eastWall = eastWall;
     }
 
-    void setNorthWall(const uint8_t northWall) const {
+    void setNorthWall(const uint8_t northWall) {
       this->northWall = northWall;
     }
 
-    void setSouthWall(const uint8_t southWall) const {
+    void setSouthWall(const uint8_t southWall) {
       this->southWall = southWall;
     }
 
-    void setWestWall(const uint8_t westWall) const {
+    void setWestWall(const uint8_t westWall) {
       this->westWall = westWall;
     }
 
@@ -109,9 +103,9 @@ namespace io {
     const static uint32_t MAP_HEIGHT = 30;
 
     Map() {
-      for (uint32_t y = 0; y < Map::MAP_HEIGHT; y++) {
-        for (uint32_t x = 0; x < Map::MAP_WIDTH; x++) {
-          setTile(x, y, TILE::SOLID);
+      for (uint32_t y = 0; y < Map::MAP_HEIGHT + 2; y++) {
+        for (uint32_t x = 0; x < Map::MAP_WIDTH + 2; x++) {
+          getCell(x, y).setSolid(true);
         }
       }
     }
@@ -120,21 +114,36 @@ namespace io {
     
     void draw(Graphics* g, const uint32_t x, const uint32_t y);
 
-    TILE getTile(const uint32_t x, const uint32_t y) {
-      if (x < Map::MAP_WIDTH && y < Map::MAP_HEIGHT) {
-        return tiles[y][x];
-      }
+    MapCell& getCell(int8_t x, int8_t y) {
+      clampCoordinates(x, y);
 
-      return TILE::SOLID;
+      return cells[y][x];
     }
 
-    void setTile(const uint32_t x, const uint32_t y, const TILE tile) {
-      if (x < Map::MAP_WIDTH && y < Map::MAP_HEIGHT) {
-        tiles[y][x] = tile;
-      }
+    bool isCellSolid(int8_t x, int8_t y) {
+      return getCell(x, y).isSolid();
     }
   private:
-    TILE tiles[MAP_HEIGHT][MAP_WIDTH];
+    //  There is a border around the map.
+    MapCell cells[MAP_HEIGHT + 2][MAP_WIDTH + 2];
+
+    void clampCoordinates(int8_t& x, int8_t& y) {
+      if (x < 0) {
+        x = 0;
+      }
+
+      if (x >= Map::MAP_WIDTH + 2) {
+        x = (Map::MAP_WIDTH + 2) - 1;
+      }
+
+      if (y < 0) {
+        y = 0;
+      }
+
+      if (y >= Map::MAP_HEIGHT + 2) {
+        y = (Map::MAP_HEIGHT + 2) - 1;
+      }
+    }
   };
 }
 #endif // mapHPP

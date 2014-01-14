@@ -38,11 +38,12 @@ namespace io {
         newMap = new Map();
         for (uint32_t y = 0; y < m->getHeight(); y++) {
           for (uint32_t x = 0; x < m->getWidth(); x++) {
+            //  We offset by 1 to account for the border.
             if (m->getPixel(x, y) == unfilled) {
-              newMap->setTile(x, y, TILE::OPEN);
+              newMap->getCell(x + 1, y + 1).setSolid(false);
             }
             else {
-              newMap->setTile(x, y, TILE::SOLID);
+              newMap->getCell(x + 1, y + 1).setSolid(true);
             }
           }
         }
@@ -54,32 +55,38 @@ namespace io {
   }
   
   void Map::draw(Graphics* g, const uint32_t cx, const uint32_t cy) {
-    for (int32_t y = -MAX_DISTANCE; y < MAX_DISTANCE; y++) {
-      for (int32_t x = -MAX_DISTANCE; x < MAX_DISTANCE; x++) {
-        TILE c = getTile(cx + x, cy + y);
-        TILE n = getTile(cx + x, cy + y - 1);
-        TILE e = getTile(cx + x + 1, cy + y);
-        TILE s = getTile(cx + x, cy + y + 1);
-        TILE w = getTile(cx + x - 1, cy + y);
-        
-        if (c != TILE::SOLID) {
+    for (int8_t y = -MAX_DISTANCE; y < MAX_DISTANCE; y++) {
+      for (int8_t x = -MAX_DISTANCE; x < MAX_DISTANCE; x++) {
+        if (!isCellSolid(cx + x, cy + y)) {
           g->drawFloorTile(x, y, 0);
           g->drawCeilingTile(x, y, 0);
 
-          if (n == TILE::SOLID) {
-            g->drawWallTile(x, y, Facing::NORTH, 0);
+          /*
+           * Remember, the get*Wall() methods return the wall you'd see if you
+           * were facing the cell from that direction.  If we're to the east
+           * of the current cell, and facing it(We're facing west), we want
+           * the EAST wall of the cell.
+           */
+
+          uint8_t wallID;
+          if (isCellSolid(cx + x, cy + y - 1)) {
+            wallID = getCell(cx + x, cy + y - 1).getSouthWall();
+            g->drawWallTile(x, y, Facing::NORTH, wallID);
           }
 
-          if (e == TILE::SOLID) {
-            g->drawWallTile(x, y, Facing::EAST, 0);
+          if (isCellSolid(cx + x + 1, cy + y)) {
+            wallID = getCell(cx + x + 1, cy + y).getWestWall();
+            g->drawWallTile(x, y, Facing::EAST, wallID);
           }
 
-          if (s == TILE::SOLID) {
-            g->drawWallTile(x, y, Facing::SOUTH, 0);
+          if (isCellSolid(cx + x, cy + y + 1)) {
+            wallID = getCell(cx + x, cy + y + 1).getNorthWall();
+            g->drawWallTile(x, y, Facing::SOUTH, wallID);
           }
 
-          if (w == TILE::SOLID) {
-            g->drawWallTile(x, y, Facing::WEST, 0);
+          if (isCellSolid(cx + x - 1, cy + y)) {
+            wallID = getCell(cx + x - 1, cy + y).getEastWall();
+            g->drawWallTile(x, y, Facing::WEST, wallID);
           }
         }
       }
