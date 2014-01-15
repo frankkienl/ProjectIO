@@ -54,9 +54,9 @@ namespace io {
     return newMap;
   }
   
-  void Map::draw(Graphics* g, const uint32_t cx, const uint32_t cy) {
-    for (int8_t y = -MAX_DISTANCE; y < MAX_DISTANCE; y++) {
-      for (int8_t x = -MAX_DISTANCE; x < MAX_DISTANCE; x++) {
+  void Map::draw(Graphics* g, const int32_t cx, const int32_t cy) {
+    for (int32_t y = -MAX_DISTANCE; y < MAX_DISTANCE; y++) {
+      for (int32_t x = -MAX_DISTANCE; x < MAX_DISTANCE; x++) {
         if (!isCellSolid(cx + x, cy + y)) {
           g->drawFloorTile(x, y, 0);
           g->drawCeilingTile(x, y, 0);

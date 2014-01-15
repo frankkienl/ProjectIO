@@ -29,6 +29,16 @@ namespace io {
    */
   class MapCell {
   public:
+    MapCell() {
+      setCellCeiling(0);
+      setCellFloor(0);
+      setEastWall(0);
+      setNorthWall(0);
+      setSouthWall(0);
+      setWestWall(0);
+      setSolid(true);
+    }
+
     uint8_t getCellCeiling() const {
       return cellCeiling;
     }
@@ -95,39 +105,35 @@ namespace io {
   };
 
   /**
-   * Represents a map.  Currently hard-coded to 35 * 30 units in size.
+   * Represents a map.  Currently hard-coded to 35 * 30 cells in size with a
+   * border of 1 cell on each side.
    */
   class Map {
   public:
-    const static uint32_t MAP_WIDTH = 35;
-    const static uint32_t MAP_HEIGHT = 30;
+    const static int32_t MAP_WIDTH = 35;
+    const static int8_t MAP_HEIGHT = 30;
 
     Map() {
-      for (uint32_t y = 0; y < Map::MAP_HEIGHT + 2; y++) {
-        for (uint32_t x = 0; x < Map::MAP_WIDTH + 2; x++) {
-          getCell(x, y).setSolid(true);
-        }
-      }
     }
 
     static Map* mapFromImage(const std::string& filename);
     
-    void draw(Graphics* g, const uint32_t x, const uint32_t y);
+    void draw(Graphics* g, const int32_t x, const int32_t y);
 
-    MapCell& getCell(int8_t x, int8_t y) {
+    MapCell& getCell(int32_t x, int32_t y) {
       clampCoordinates(x, y);
 
       return cells[y][x];
     }
 
-    bool isCellSolid(int8_t x, int8_t y) {
+    bool isCellSolid(int32_t x, int32_t y) {
       return getCell(x, y).isSolid();
     }
   private:
     //  There is a border around the map.
     MapCell cells[MAP_HEIGHT + 2][MAP_WIDTH + 2];
 
-    void clampCoordinates(int8_t& x, int8_t& y) {
+    void clampCoordinates(int32_t& x, int32_t& y) {
       if (x < 0) {
         x = 0;
       }
