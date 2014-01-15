@@ -158,7 +158,7 @@ namespace io {
       break;
     }
 
-    if (!currentMap->isCellSolid(newX, newY)) {
+    if (currentMap->canEntityEnterCell(newX, newY)) {
       player->setX(newX);
       player->setY(newY);
     }
@@ -191,7 +191,7 @@ namespace io {
       break;
     }
 
-    if (!currentMap->isCellSolid(newX, newY)) {
+    if (currentMap->canEntityEnterCell(newX, newY)) {
       player->setX(newX);
       player->setY(newY);
     }

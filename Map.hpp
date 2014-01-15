@@ -45,6 +45,14 @@ namespace io {
       return activatable;
     }
 
+    bool canEntityEnterCell() const {
+      if (getActivatable()) {
+        return !(isSolid() || getActivatable()->isSolid());
+      }
+
+      return !isSolid();
+    }
+
     uint8_t getCellCeiling() const {
       return cellCeiling;
     }
@@ -70,12 +78,7 @@ namespace io {
     }
 
     bool isSolid() const {
-      bool activatableSolid = false;
-      if (activatable) {
-        activatableSolid = activatable->isSolid();
-      }
-
-      return (solid || activatableSolid);
+      return solid;
     }
 
     void setActivatable(Activatable* activatable) {
@@ -142,8 +145,8 @@ namespace io {
       return cells[y][x];
     }
 
-    bool isCellSolid(int32_t x, int32_t y) {
-      return getCell(x, y).isSolid();
+    bool canEntityEnterCell(const int32_t x, const int32_t y) {
+      return getCell(x, y).canEntityEnterCell();
     }
   private:
     //  There is a border around the map.
@@ -165,6 +168,10 @@ namespace io {
       if (y >= Map::MAP_HEIGHT + 2) {
         y = (Map::MAP_HEIGHT + 2) - 1;
       }
+    }
+
+    bool isCellSolid(const int32_t x, const int32_t y) {
+      return getCell(x, y).isSolid();
     }
   };
 }
