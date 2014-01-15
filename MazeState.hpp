@@ -12,7 +12,7 @@
  *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
-*/
+ */
 #ifndef MazeStateHPP
 #define MazeStateHPP
 
@@ -41,6 +41,7 @@ namespace io {
     virtual void handleInputEvent(const InputEvent& event);
     virtual void onActivate();
 
+    void activateActivatable();
     void movePlayerForward();
     void movePlayerBackward();
     void turnPlayerLeft();

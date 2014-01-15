@@ -12,7 +12,7 @@
  *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
-*/
+ */
 #include "MazeState.hpp"
 #include "Map.hpp"
 #include "Common.hpp"
@@ -42,7 +42,7 @@ namespace io {
       inputDisabledTicks--;
 
       //if (inputDisabledTicks == 0) {
-        inputDisabled = false;
+      inputDisabled = false;
       //}
     }
   }
@@ -52,7 +52,7 @@ namespace io {
     g->loadIdentity();
     g->translate(cameraX, -6.0f, cameraY);
     g->rotate(cameraAngle, 0.0f, 1.0f, 0.0f);
-    switch(player->getFacing()) {
+    switch (player->getFacing()) {
     case Facing::NORTH:
       g->rotate(toRadians(0), 0.0f, 1.0f, 0.0f);
       break;
@@ -77,21 +77,24 @@ namespace io {
 
   void MazeState::handleInputEvent(const InputEvent& event) {
     if (event.getState() == InputEventState::DOWN) {
-      switch(event.getType()) {
-        case InputEventType::UP:
-          movePlayerForward();
-          break;
-        case InputEventType::DOWN:
-          movePlayerBackward();
-          break;
-        case InputEventType::LEFT:
-          turnPlayerLeft();
-          break;
-        case InputEventType::RIGHT:
-          turnPlayerRight();
-          break;
-        default:
-          break;
+      switch (event.getType()) {
+      case InputEventType::ACCEPT:
+        activateActivatable();
+        break;
+      case InputEventType::UP:
+        movePlayerForward();
+        break;
+      case InputEventType::DOWN:
+        movePlayerBackward();
+        break;
+      case InputEventType::LEFT:
+        turnPlayerLeft();
+        break;
+      case InputEventType::RIGHT:
+        turnPlayerRight();
+        break;
+      default:
+        break;
       }
     }
   }
@@ -106,6 +109,32 @@ namespace io {
     cameraAngle = 0;
   }
 
+  void MazeState::activateActivatable() {
+    Activatable* activatable = nullptr;
+    switch (player->getFacing()) {
+    case Facing::NORTH:
+      activatable = currentMap->getCell(player->getX(), player->getY() - 1)
+          .getActivatable();
+      break;
+    case Facing::EAST:
+      activatable = currentMap->getCell(player->getX() + 1, player->getY())
+          .getActivatable();
+      break;
+    case Facing::SOUTH:
+      activatable = currentMap->getCell(player->getX(), player->getY() + 1)
+          .getActivatable();
+      break;
+    case Facing::WEST:
+      activatable = currentMap->getCell(player->getX() - 1, player->getY())
+          .getActivatable();
+      break;
+    }
+
+    if (activatable) {
+      activatable->activate(player);
+    }
+  }
+
   void MazeState::movePlayerForward() {
     if (inputDisabled) {
       return;
@@ -114,19 +143,19 @@ namespace io {
     int32_t newX = player->getX();
     int32_t newY = player->getY();
 
-    switch(player->getFacing()) {
-      case Facing::NORTH:
-        newY--;
-        break;
-      case Facing::EAST:
-        newX++;
-        break;
-      case Facing::SOUTH:
-        newY++;
-        break;
-      case Facing::WEST:
-        newX--;
-        break;
+    switch (player->getFacing()) {
+    case Facing::NORTH:
+      newY--;
+      break;
+    case Facing::EAST:
+      newX++;
+      break;
+    case Facing::SOUTH:
+      newY++;
+      break;
+    case Facing::WEST:
+      newX--;
+      break;
     }
 
     if (!currentMap->isCellSolid(newX, newY)) {
@@ -147,19 +176,19 @@ namespace io {
     int32_t newX = player->getX();
     int32_t newY = player->getY();
 
-    switch(player->getFacing()) {
-      case Facing::NORTH:
-        newY++;
-        break;
-      case Facing::EAST:
-        newX--;
-        break;
-      case Facing::SOUTH:
-        newY--;
-        break;
-      case Facing::WEST:
-        newX++;
-        break;
+    switch (player->getFacing()) {
+    case Facing::NORTH:
+      newY++;
+      break;
+    case Facing::EAST:
+      newX--;
+      break;
+    case Facing::SOUTH:
+      newY--;
+      break;
+    case Facing::WEST:
+      newX++;
+      break;
     }
 
     if (!currentMap->isCellSolid(newX, newY)) {
@@ -177,19 +206,19 @@ namespace io {
       return;
     }
 
-    switch(player->getFacing()) {
-      case Facing::NORTH:
-        player->setFacing(Facing::WEST);
-        break;
-      case Facing::EAST:
-        player->setFacing(Facing::NORTH);
-        break;
-      case Facing::SOUTH:
-        player->setFacing(Facing::EAST);
-        break;
-      case Facing::WEST:
-        player->setFacing(Facing::SOUTH);
-        break;
+    switch (player->getFacing()) {
+    case Facing::NORTH:
+      player->setFacing(Facing::WEST);
+      break;
+    case Facing::EAST:
+      player->setFacing(Facing::NORTH);
+      break;
+    case Facing::SOUTH:
+      player->setFacing(Facing::EAST);
+      break;
+    case Facing::WEST:
+      player->setFacing(Facing::SOUTH);
+      break;
     }
 
     //animationState = MazeAnimationState::TURNING_LEFT;
@@ -202,19 +231,19 @@ namespace io {
       return;
     }
 
-    switch(player->getFacing()) {
-      case Facing::NORTH:
-        player->setFacing(Facing::EAST);
-        break;
-      case Facing::EAST:
-        player->setFacing(Facing::SOUTH);
-        break;
-      case Facing::SOUTH:
-        player->setFacing(Facing::WEST);
-        break;
-      case Facing::WEST:
-        player->setFacing(Facing::NORTH);
-        break;
+    switch (player->getFacing()) {
+    case Facing::NORTH:
+      player->setFacing(Facing::EAST);
+      break;
+    case Facing::EAST:
+      player->setFacing(Facing::SOUTH);
+      break;
+    case Facing::SOUTH:
+      player->setFacing(Facing::WEST);
+      break;
+    case Facing::WEST:
+      player->setFacing(Facing::NORTH);
+      break;
     }
 
     //animationState = MazeAnimationState::TURNING_RIGHT;

@@ -17,6 +17,7 @@
 #define MapHPP
 
 #include "Graphics.hpp"
+#include "Activatables.hpp"
 #include <string>
 #include <cstdint>
 
@@ -30,6 +31,7 @@ namespace io {
   class MapCell {
   public:
     MapCell() {
+      setActivatable(nullptr);
       setCellCeiling(0);
       setCellFloor(0);
       setEastWall(0);
@@ -37,6 +39,10 @@ namespace io {
       setSouthWall(0);
       setWestWall(0);
       setSolid(true);
+    }
+
+    Activatable* getActivatable() const {
+      return activatable;
     }
 
     uint8_t getCellCeiling() const {
@@ -64,7 +70,16 @@ namespace io {
     }
 
     bool isSolid() const {
-      return solid;
+      bool activatableSolid = false;
+      if (activatable) {
+        activatableSolid = activatable->isSolid();
+      }
+
+      return (solid || activatableSolid);
+    }
+
+    void setActivatable(Activatable* activatable) {
+      this->activatable = activatable;
     }
 
     void setCellCeiling(const uint8_t cellCeiling) {
@@ -95,6 +110,7 @@ namespace io {
       this->solid = solid;
     }
   private:
+    Activatable* activatable;
     uint8_t cellCeiling;
     uint8_t cellFloor;
     uint8_t eastWall;

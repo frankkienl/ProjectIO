@@ -59,7 +59,7 @@ namespace io {
     }
 
     virtual void activate(Entity* activator) {
-      if (getOrientation() == Orientation::HORIZONTAL) {
+      if (getOrientation() == Orientation::VERTICAL) {
         switch(activator->getFacing()) {
         case Facing::NORTH:
           activator->setY(activator->getY() - 2);

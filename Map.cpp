@@ -14,9 +14,6 @@
  *  limitations under the License.
 */
 #include "Map.hpp"
-#include "Utility.hpp"
-#include <exception>
-#include <stdexcept>
 #include "ResourceManager.hpp"
 
 namespace io {
@@ -24,7 +21,9 @@ namespace io {
 
   Map* Map::mapFromImage(const std::string& filename) {
     Colour unfilled(200, 200, 250, 255);
-    
+    Colour vertDoor(255, 0, 0, 255);
+    Colour horzDoor(0, 0, 255, 255);
+
     Map* newMap = nullptr;
     
     /**
@@ -39,8 +38,22 @@ namespace io {
         for (uint32_t y = 0; y < m->getHeight(); y++) {
           for (uint32_t x = 0; x < m->getWidth(); x++) {
             //  We offset by 1 to account for the border.
-            if (m->getPixel(x, y) == unfilled) {
+            Colour pix = m->getPixel(x, y);
+
+            if (pix == unfilled) {
               newMap->getCell(x + 1, y + 1).setSolid(false);
+            }
+            else if (pix == vertDoor) {
+              newMap->getCell(x + 1, y + 1).setSolid(false);
+              Door* d = new Door();
+              d->setOrientation(Orientation::VERTICAL);
+              newMap->getCell(x + 1, y + 1).setActivatable(d);
+            }
+            else if (pix == horzDoor) {
+              newMap->getCell(x + 1, y + 1).setSolid(false);
+              Door* d = new Door();
+              d->setOrientation(Orientation::HORIZONTAL);
+              newMap->getCell(x + 1, y + 1).setActivatable(d);
             }
             else {
               newMap->getCell(x + 1, y + 1).setSolid(true);
