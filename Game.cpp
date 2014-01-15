@@ -23,7 +23,7 @@ namespace io {
     player = new Player();
     currentState = nullptr;
     curGameState = GameState::MAZE;
-    mazeState = new MazeState(this);
+    mazeState = new MazeState(this, player);
     townState = new TownState(this, screenManager, player->getGuild(),
                               player->getParty());
 

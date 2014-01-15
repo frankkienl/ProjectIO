@@ -20,6 +20,7 @@
 #include "State.hpp"
 #include "Map.hpp"
 #include "StateMachine.hpp"
+#include "Player.hpp"
 
 namespace io {
   enum class MazeAnimationState {
@@ -27,11 +28,12 @@ namespace io {
     TURNING_RIGHT,
     MOVING_FORWARD,
     MOVING_BACKWARD,
+    NONE
   };
 
   class MazeState : public State {
   public:
-    MazeState(StateMachine* stateMachine);
+    MazeState(StateMachine* stateMachine, Player* player);
     virtual ~MazeState();
 
     virtual void tick();
@@ -46,9 +48,7 @@ namespace io {
   private:
     uint32_t currentFloor;
     Map* currentMap;
-    Facing playerFacing;
-    int32_t playerX;
-    int32_t playerY;
+    Player* player;
     StateMachine* stateMachine;
 
     bool inputDisabled;

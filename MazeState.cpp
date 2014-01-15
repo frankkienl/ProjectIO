@@ -19,12 +19,10 @@
 #include "Utility.hpp"
 
 namespace io {
-  MazeState::MazeState(StateMachine* stateMachine) {
+  MazeState::MazeState(StateMachine* stateMachine, Player* player) {
     currentFloor = 1;
     currentMap = Map::mapFromImage("data/map.png");
-    playerFacing = Facing::NORTH;
-    playerX = 0;
-    playerY = 0;
+    this->player = player;
     inputDisabled = false;
     inputDisabledTicks = 0;
     animationState = MazeAnimationState::TURNING_LEFT;
@@ -54,7 +52,7 @@ namespace io {
     g->loadIdentity();
     g->translate(cameraX, -6.0f, cameraY);
     g->rotate(cameraAngle, 0.0f, 1.0f, 0.0f);
-    switch(playerFacing) {
+    switch(player->getFacing()) {
     case Facing::NORTH:
       g->rotate(toRadians(0), 0.0f, 1.0f, 0.0f);
       break;
@@ -74,7 +72,7 @@ namespace io {
     g->setMatrixMode(MatrixMode::MODEL);
     g->loadIdentity();
 
-    currentMap->draw(g, playerX, playerY);
+    currentMap->draw(g, player->getX(), player->getY());
   }
 
   void MazeState::handleInputEvent(const InputEvent& event) {
@@ -99,9 +97,9 @@ namespace io {
   }
 
   void MazeState::onActivate() {
-    playerX = 7;
-    playerY = 20;
-    playerFacing = Facing::NORTH;
+    player->setX(7);
+    player->setY(20);
+    player->setFacing(Facing::NORTH);
 
     cameraX = 0.0f;
     cameraY = 0.0f;
@@ -113,10 +111,10 @@ namespace io {
       return;
     }
 
-    int32_t newX = playerX;
-    int32_t newY = playerY;
+    int32_t newX = player->getX();
+    int32_t newY = player->getY();
 
-    switch(playerFacing) {
+    switch(player->getFacing()) {
       case Facing::NORTH:
         newY--;
         break;
@@ -132,13 +130,13 @@ namespace io {
     }
 
     if (!currentMap->isCellSolid(newX, newY)) {
-      playerX = newX;
-      playerY = newY;
+      player->setX(newX);
+      player->setY(newY);
     }
 
-    animationState = MazeAnimationState::MOVING_FORWARD;
-    inputDisabledTicks = 30;
-    inputDisabled = true;
+    //animationState = MazeAnimationState::MOVING_FORWARD;
+    //inputDisabledTicks = 30;
+    //inputDisabled = true;
   }
 
   void MazeState::movePlayerBackward() {
@@ -146,10 +144,10 @@ namespace io {
       return;
     }
 
-    int32_t newX = playerX;
-    int32_t newY = playerY;
+    int32_t newX = player->getX();
+    int32_t newY = player->getY();
 
-    switch(playerFacing) {
+    switch(player->getFacing()) {
       case Facing::NORTH:
         newY++;
         break;
@@ -165,13 +163,13 @@ namespace io {
     }
 
     if (!currentMap->isCellSolid(newX, newY)) {
-      playerX = newX;
-      playerY = newY;
+      player->setX(newX);
+      player->setY(newY);
     }
 
-    animationState = MazeAnimationState::MOVING_BACKWARD;
-    inputDisabledTicks = 30;
-    inputDisabled = true;
+    //animationState = MazeAnimationState::MOVING_BACKWARD;
+    //inputDisabledTicks = 30;
+    //inputDisabled = true;
   }
 
   void MazeState::turnPlayerLeft() {
@@ -179,24 +177,24 @@ namespace io {
       return;
     }
 
-    switch(playerFacing) {
+    switch(player->getFacing()) {
       case Facing::NORTH:
-        playerFacing = Facing::WEST;
+        player->setFacing(Facing::WEST);
         break;
       case Facing::EAST:
-        playerFacing = Facing::NORTH;
+        player->setFacing(Facing::NORTH);
         break;
       case Facing::SOUTH:
-        playerFacing = Facing::EAST;
+        player->setFacing(Facing::EAST);
         break;
       case Facing::WEST:
-        playerFacing = Facing::SOUTH;
+        player->setFacing(Facing::SOUTH);
         break;
     }
 
-    animationState = MazeAnimationState::TURNING_LEFT;
-    inputDisabledTicks = 30;
-    inputDisabled = true;
+    //animationState = MazeAnimationState::TURNING_LEFT;
+    //inputDisabledTicks = 30;
+    //inputDisabled = true;
   }
 
   void MazeState::turnPlayerRight() {
@@ -204,23 +202,23 @@ namespace io {
       return;
     }
 
-    switch(playerFacing) {
+    switch(player->getFacing()) {
       case Facing::NORTH:
-        playerFacing = Facing::EAST;
+        player->setFacing(Facing::EAST);
         break;
       case Facing::EAST:
-        playerFacing = Facing::SOUTH;
+        player->setFacing(Facing::SOUTH);
         break;
       case Facing::SOUTH:
-        playerFacing = Facing::WEST;
+        player->setFacing(Facing::WEST);
         break;
       case Facing::WEST:
-        playerFacing = Facing::NORTH;
+        player->setFacing(Facing::NORTH);
         break;
     }
 
-    animationState = MazeAnimationState::TURNING_RIGHT;
-    inputDisabledTicks = 30;
-    inputDisabled = true;
+    //animationState = MazeAnimationState::TURNING_RIGHT;
+    //inputDisabledTicks = 30;
+    //inputDisabled = true;
   }
 }
