@@ -17,11 +17,18 @@
 #include "Map.hpp"
 #include "Common.hpp"
 #include "Utility.hpp"
+#include "Log.hpp"
 
 namespace io {
   MazeState::MazeState(StateMachine* stateMachine, Player* player) {
     currentFloor = 1;
-    currentMap = Map::mapFromImage("data/map.png");
+
+    currentMap = Map::mapFromXML("data/floors/floor1.xml");
+    if (!currentMap) {
+      writeToLog(MessageLevel::ERROR, "Could not load floor.\n");
+      exit(1);
+    }
+
     this->player = player;
     inputDisabled = false;
     inputDisabledTicks = 0;
@@ -100,8 +107,8 @@ namespace io {
   }
 
   void MazeState::onActivate() {
-    player->setX(7);
-    player->setY(20);
+    player->setX(18);
+    player->setY(29);
     player->setFacing(Facing::NORTH);
 
     cameraX = 0.0f;

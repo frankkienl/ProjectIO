@@ -130,11 +130,23 @@ namespace io {
   class Map {
   public:
     const static int32_t MAP_WIDTH = 35;
-    const static int8_t MAP_HEIGHT = 30;
+    const static int32_t MAP_HEIGHT = 30;
 
     Map() {
     }
 
+    ~Map() {
+      for (int32_t y = 0; y < Map::MAP_HEIGHT; y++) {
+        for (int32_t x = 0; x < Map::MAP_WIDTH; x++) {
+          Activatable* cellActivatable = getCell(x, y).getActivatable();
+          if (cellActivatable) {
+            delete cellActivatable;
+          }
+        }
+      }
+    }
+
+    static Map* mapFromXML(const std::string& filename);
     static Map* mapFromImage(const std::string& filename);
     
     void draw(Graphics* g, const int32_t x, const int32_t y);

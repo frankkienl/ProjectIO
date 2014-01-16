@@ -15,14 +15,136 @@
 */
 #include "Map.hpp"
 #include "ResourceManager.hpp"
+#include "tinyxml2.h"
+#include "Log.hpp"
+#include <exception>
+#include <stdexcept>
+#include <iostream>
+
+using namespace tinyxml2;
 
 namespace io {
   const int32_t MAX_DISTANCE = 64;
 
+  Map* Map::mapFromXML(const std::string& filename) {
+    writeToLog(MessageLevel::INFO, "Loading map from file \"%s\"\n", filename.c_str());
+
+    Map* newMap = nullptr;
+    XMLDocument doc;
+    try {
+      if (doc.LoadFile(filename.c_str()) == XML_SUCCESS) {
+        XMLElement* root = doc.RootElement();
+
+        if (std::string(root->Name()).compare("floor") != 0) {
+          throw std::runtime_error("Map::mapFromXML:  Not a floor file.");
+        }
+
+        XMLElement* titleElement = root->FirstChildElement("title");
+        XMLElement* imageElement = root->FirstChildElement("image");
+        XMLElement* objectsElement = root->FirstChildElement("objects");
+
+        if (!titleElement || !imageElement) {
+          throw std::runtime_error("Map::mapFromXML:  Missing title or image.");
+        }
+
+        const char* title = titleElement->GetText();
+        const char* image = imageElement->GetText();
+
+        if (!title || !image) {
+          throw std::runtime_error("Map::mapFromXML:  Empty title or image.");
+        }
+
+        newMap = Map::mapFromImage(image);
+        if (!newMap) {
+          throw std::runtime_error("Map::mapFromXML:  Unable to load map image.");
+        }
+
+        if (objectsElement) {
+          XMLNode* curNode = objectsElement->FirstChild();
+          while (curNode) {
+            XMLElement* element = curNode->ToElement();
+            if (element) {
+              XMLElement* xElement = element->FirstChildElement("x");
+              XMLElement* yElement = element->FirstChildElement("y");
+
+              if (!xElement || !yElement) {
+                throw std::runtime_error("Map::mapFromXML:  Missing X or Y element in object.");
+              }
+
+              int32_t x = 0;
+              if (xElement->QueryIntText(&x) != XML_SUCCESS) {
+                throw std::runtime_error("Map::mapFromXML:  Could not parse X value.");
+              }
+
+              int32_t y = 0;
+              if (yElement->QueryIntText(&y) != XML_SUCCESS) {
+                throw std::runtime_error("Map::mapFromXML:  Could not parse Y value.");
+              }
+
+              if (x < 0 || x >= Map::MAP_WIDTH || y < 0 || y >= Map::MAP_HEIGHT) {
+                throw std::out_of_range("Map::mapFromXML:  X or Y outside of map.");
+              }
+
+              std::string name = element->Name();
+              if (name.compare("door") == 0) {
+                XMLElement* orientation = element->FirstChildElement("orientation");
+                if (!orientation) {
+                  throw std::runtime_error("Map::mapFromXML:  Missing door orientation.");
+                }
+
+                const char* orientationText = orientation->GetText();
+                if (!orientationText) {
+                  throw std::runtime_error("Map::mapFromXML:  Empty door orientation.");
+                }
+
+                std::string orientationString = orientationText;
+
+                Orientation orientationEnum;
+                if (orientationString.compare("horizontal") == 0) {
+                  orientationEnum = Orientation::HORIZONTAL;
+                }
+                else if (orientationString.compare("vertical") == 0) {
+                  orientationEnum = Orientation::VERTICAL;
+                }
+                else {
+                  throw std::runtime_error("Map::mapFromXML:  Invalid door orientation specified.");
+                }
+
+                Door* d = new Door();
+                d->setOrientation(orientationEnum);
+
+                newMap->getCell(x + 1, y + 1).setActivatable(d);
+              }
+              else if (name.compare("secretDoor") == 0) {
+
+              }
+              else {
+                throw std::runtime_error("Map::mapFromXML:  Unknown object type.");
+              }
+            }
+
+            curNode = curNode->NextSibling();
+          }
+        }
+        else {
+          writeToLog(MessageLevel::WARNING, "Map::mapFromXML:  Missing objects element.  Possibly a mistake?");
+        }
+      }
+    }
+    catch (std::exception& e) {
+      if (newMap) {
+        delete newMap;
+        newMap = nullptr;
+      }
+
+      writeToLog(MessageLevel::ERROR, "%s\n", e.what());
+    }
+
+    return newMap;
+  }
+
   Map* Map::mapFromImage(const std::string& filename) {
     Colour unfilled(200, 200, 250, 255);
-    Colour vertDoor(255, 0, 0, 255);
-    Colour horzDoor(0, 0, 255, 255);
 
     Map* newMap = nullptr;
     
@@ -38,22 +160,8 @@ namespace io {
         for (uint32_t y = 0; y < m->getHeight(); y++) {
           for (uint32_t x = 0; x < m->getWidth(); x++) {
             //  We offset by 1 to account for the border.
-            Colour pix = m->getPixel(x, y);
-
-            if (pix == unfilled) {
+            if (m->getPixel(x, y) == unfilled) {
               newMap->getCell(x + 1, y + 1).setSolid(false);
-            }
-            else if (pix == vertDoor) {
-              newMap->getCell(x + 1, y + 1).setSolid(false);
-              Door* d = new Door();
-              d->setOrientation(Orientation::VERTICAL);
-              newMap->getCell(x + 1, y + 1).setActivatable(d);
-            }
-            else if (pix == horzDoor) {
-              newMap->getCell(x + 1, y + 1).setSolid(false);
-              Door* d = new Door();
-              d->setOrientation(Orientation::HORIZONTAL);
-              newMap->getCell(x + 1, y + 1).setActivatable(d);
             }
             else {
               newMap->getCell(x + 1, y + 1).setSolid(true);
