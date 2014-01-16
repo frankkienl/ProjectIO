@@ -36,7 +36,7 @@ namespace io {
         XMLElement* root = doc.RootElement();
 
         if (std::string(root->Name()).compare("floor") != 0) {
-          throw std::runtime_error("Map::mapFromXML:  Not a floor file.");
+          throw std::runtime_error("Map::mapFromXML():  Not a floor file.");
         }
 
         XMLElement* titleElement = root->FirstChildElement("title");
@@ -44,19 +44,19 @@ namespace io {
         XMLElement* objectsElement = root->FirstChildElement("objects");
 
         if (!titleElement || !imageElement) {
-          throw std::runtime_error("Map::mapFromXML:  Missing title or image.");
+          throw std::runtime_error("Map::mapFromXML():  Missing title or image.");
         }
 
         const char* title = titleElement->GetText();
         const char* image = imageElement->GetText();
 
         if (!title || !image) {
-          throw std::runtime_error("Map::mapFromXML:  Empty title or image.");
+          throw std::runtime_error("Map::mapFromXML():  Empty title or image.");
         }
 
         newMap = Map::mapFromImage(image);
         if (!newMap) {
-          throw std::runtime_error("Map::mapFromXML:  Unable to load map image.");
+          throw std::runtime_error("Map::mapFromXML():  Unable to load map image.");
         }
 
         if (objectsElement) {
@@ -68,37 +68,31 @@ namespace io {
               XMLElement* yElement = element->FirstChildElement("y");
 
               if (!xElement || !yElement) {
-                throw std::runtime_error("Map::mapFromXML:  Missing X or Y element in object.");
+                throw std::runtime_error("Map::mapFromXM()L:  Missing X or Y element in object.");
               }
 
               int32_t x = 0;
               if (xElement->QueryIntText(&x) != XML_SUCCESS) {
-                throw std::runtime_error("Map::mapFromXML:  Could not parse X value.");
+                throw std::runtime_error("Map::mapFromXML():  Could not parse X value.");
               }
 
               int32_t y = 0;
               if (yElement->QueryIntText(&y) != XML_SUCCESS) {
-                throw std::runtime_error("Map::mapFromXML:  Could not parse Y value.");
+                throw std::runtime_error("Map::mapFromXML():  Could not parse Y value.");
               }
 
               if (x < 0 || x >= Map::MAP_WIDTH || y < 0 || y >= Map::MAP_HEIGHT) {
-                throw std::out_of_range("Map::mapFromXML:  X or Y outside of map.");
+                throw std::out_of_range("Map::mapFromXML():  X or Y outside of map.");
               }
 
               std::string name = element->Name();
               if (name.compare("door") == 0) {
                 XMLElement* orientation = element->FirstChildElement("orientation");
-                if (!orientation) {
-                  throw std::runtime_error("Map::mapFromXML:  Missing door orientation.");
+                if (!orientation || !orientation->GetText()) {
+                  throw std::runtime_error("Map::mapFromXM():  Empty or missing door orientation.");
                 }
 
-                const char* orientationText = orientation->GetText();
-                if (!orientationText) {
-                  throw std::runtime_error("Map::mapFromXML:  Empty door orientation.");
-                }
-
-                std::string orientationString = orientationText;
-
+                std::string orientationString = orientation->GetText();
                 Orientation orientationEnum;
                 if (orientationString.compare("horizontal") == 0) {
                   orientationEnum = Orientation::HORIZONTAL;
@@ -107,7 +101,7 @@ namespace io {
                   orientationEnum = Orientation::VERTICAL;
                 }
                 else {
-                  throw std::runtime_error("Map::mapFromXML:  Invalid door orientation specified.");
+                  throw std::runtime_error("Map::mapFromXML():  Invalid door orientation specified.");
                 }
 
                 Door* d = new Door();
@@ -116,10 +110,42 @@ namespace io {
                 newMap->getCell(x + 1, y + 1).setActivatable(d);
               }
               else if (name.compare("secretDoor") == 0) {
+                XMLElement* direction = element->FirstChildElement("direction");
+                if (!direction || !direction->GetText()) {
+                  throw std::runtime_error("Map::mapFromXML():  Empty or missing secret door direction.");
+                }
 
+                std::string directionString = direction->GetText();
+                SecretDoorDirection directionEnum;
+                if (directionString.compare("north") == 0) {
+                  directionEnum = SecretDoorDirection::NORTH;
+                }
+                else if (directionString.compare("east") == 0) {
+                  directionEnum = SecretDoorDirection::EAST;
+                }
+                else if (directionString.compare("south") == 0) {
+                  directionEnum = SecretDoorDirection::SOUTH;
+                }
+                else if (directionString.compare("west") == 0) {
+                  directionEnum = SecretDoorDirection::WEST;
+                }
+                else if (directionString.compare("north-south") == 0) {
+                  directionEnum = SecretDoorDirection::NORTH_SOUTH;
+                }
+                else if (directionString.compare("east-west") == 0) {
+                  directionEnum = SecretDoorDirection::EAST_WEST;
+                }
+                else {
+                  throw std::runtime_error("Map::mapFromXML():  Invalid secret door direction.");
+                }
+
+                SecretDoor* sd = new SecretDoor();
+                sd->setDirection(directionEnum);
+
+                newMap->getCell(x + 1, y + 1).setActivatable(sd);
               }
               else {
-                throw std::runtime_error("Map::mapFromXML:  Unknown object type.");
+                throw std::runtime_error("Map::mapFromXML():  Unknown object type.");
               }
             }
 
@@ -127,7 +153,7 @@ namespace io {
           }
         }
         else {
-          writeToLog(MessageLevel::WARNING, "Map::mapFromXML:  Missing objects element.  Possibly a mistake?");
+          writeToLog(MessageLevel::WARNING, "Map::mapFromXM()L:  Missing objects element.  Possibly a mistake?");
         }
       }
     }
