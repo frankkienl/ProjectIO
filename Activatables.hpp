@@ -178,6 +178,9 @@ namespace io {
   class Stairs : public Activatable {
   public:
     Stairs() {
+      setDestinationFacing(Facing::NORTH);
+      setDestinationX(0);
+      setDestinationY(0);
       setDirection(StairDirection::UP);
     }
 
@@ -193,10 +196,38 @@ namespace io {
       return direction;
     }
 
+    Facing getDestinationFacing() const {
+      return destinationFacing;
+    }
+
+    int32_t getDestinationX() const {
+      return destinationX;
+    }
+
+    int32_t getDestinationY() const {
+      return destinationY;
+    }
+
+    void setDestinationFacing(const Facing destinationFacing) {
+      this->destinationFacing = destinationFacing;
+    }
+
+    void setDestinationX(const int32_t destinationX) {
+      this->destinationX = destinationX;
+    }
+
+    void setDestinationY(const int32_t destinationY) {
+      this->destinationY = destinationY;
+    }
+
     void setDirection(const StairDirection direction) {
       this->direction = direction;
     }
+
   private:
+    Facing destinationFacing;
+    int32_t destinationX;
+    int32_t destinationY;
     StairDirection direction;
   };
 }
