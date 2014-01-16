@@ -23,11 +23,13 @@ namespace io {
   MazeState::MazeState(StateMachine* stateMachine, Player* player) {
     currentFloor = 1;
 
-    currentMap = Map::mapFromXML("data/floors/floor1.xml");
-    if (!currentMap) {
-      writeToLog(MessageLevel::ERROR, "Could not load floor.\n");
+    maze = Maze::mazeFromXML("data/maze.xml");
+    if (!maze || maze->getFloorCount() == 0) {
+      writeToLog(MessageLevel::ERROR, "Could not load maze.\n");
       exit(1);
     }
+
+    currentMap = maze->getFloor(1);
 
     this->player = player;
     inputDisabled = false;
@@ -41,7 +43,8 @@ namespace io {
   }
 
   MazeState::~MazeState() {
-    delete currentMap;
+    delete maze;
+    maze = nullptr;
   }
 
   void MazeState::tick() {

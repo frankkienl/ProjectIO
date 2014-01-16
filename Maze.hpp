@@ -16,4 +16,44 @@
 #ifndef MazeHPP
 #define MazeHPP
 
+#include <list>
+#include <string>
+#include "Map.hpp"
+
+namespace io {
+  /**
+   * Represents a multi-floor maze.  Not much to say about it.
+   */
+  class Maze {
+  public:
+    Maze() {
+
+    }
+
+    static Maze* mazeFromXML(const std::string& filename);
+
+    ~Maze() {
+      for (Map* m : floors) {
+        delete m;
+      }
+      floors.clear();
+    }
+
+    //  Floors are 1-indexed.  Floor 0 indicates the town.
+    Map* getFloor(const uint32_t which) {
+      if (which == 0 || which > floors.size()) {
+        return nullptr;
+      }
+
+      return floors.at(which - 1);
+    }
+
+    uint32_t getFloorCount() const {
+      return floors.size();
+    }
+  private:
+    std::vector<Map*> floors;
+  };
+}
+
 #endif

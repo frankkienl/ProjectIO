@@ -18,7 +18,7 @@
 
 #include <cstdint>
 #include "State.hpp"
-#include "Map.hpp"
+#include "Maze.hpp"
 #include "StateMachine.hpp"
 #include "Player.hpp"
 
@@ -49,6 +49,7 @@ namespace io {
   private:
     uint32_t currentFloor;
     Map* currentMap;
+    Maze* maze;
     Player* player;
     StateMachine* stateMachine;
 
